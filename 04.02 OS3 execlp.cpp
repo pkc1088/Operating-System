@@ -10,8 +10,8 @@ int main() {
     pid_t pid;
     pid = fork();
     if(pid == 0) {
-        execlp("/bin/ls", "ls", NULL);      //p1À» ¸í·É¾î ls·Î µ¤¾î¾º¿ö¶ó´Â ¶æ
-        printf("hey");                      //±×·¸°ÔµÇ¸é hey°¡ ÇÁ¸°Æ® ¾ÈµÊ
+        execlp("/bin/ls", "ls", NULL);      //p1ì„ ëª…ë ¹ì–´ lsë¡œ ë®ì–´ì”Œì›Œë¼ëŠ” ëœ»
+        printf("hey");                      //ê·¸ë ‡ê²Œë˜ë©´ heyê°€ í”„ë¦°íŠ¸ ì•ˆë¨
     } else if(pid > 0) {
         wait(NULL);
         printf("Child completed, %d\n", getpid());
