@@ -34,8 +34,8 @@ int main()
 	ptr += strlen(message0);
 	sprintf(ptr,"%s",message1);
 	ptr += strlen(message1);
-	sprintf(ptr,"%s",message2);	//sprintf´Â bw.writeÃ³·³ ³ªÁß¿¡ ÇÑ¹ø¿¡ Ãâ·ÂÇÒ ¼ö ÀÖ°Ô
-								//¹öÆÛ·Î ¹Ş¾Æ³õ´Â°ÅÀÓ(consumer¿¡¼­ printf·Î ÇÑ¹ø¿¡ Ãâ·ÂÇÔ) 
+	sprintf(ptr,"%s",message2);	//sprintfëŠ” bw.writeì²˜ëŸ¼ ë‚˜ì¤‘ì— í•œë²ˆì— ì¶œë ¥í•  ìˆ˜ ìˆê²Œ
+								//ë²„í¼ë¡œ ë°›ì•„ë†“ëŠ”ê±°ì„(consumerì—ì„œ printfë¡œ í•œë²ˆì— ì¶œë ¥í•¨) 
 	ptr += strlen(message2);
 
 	return 0;
