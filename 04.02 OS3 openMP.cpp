@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
 	/* sequential code */
 	
-	// omp_set_num_threads(4) ÇÏ¸é ¾²·¹µå 4°³ »ı¼º 
+	// omp_set_num_threads(4) í•˜ë©´ ì“°ë ˆë“œ 4ê°œ ìƒì„± 
 	#pragma omp parallel
 	{
 		printf("I am a parallel region\n");
@@ -16,4 +16,4 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-// compiler°¡ parallel ÇÏ°Ô Ã³¸®ÇÏµµ·Ï Áö½ÃÇÔ 
+// compilerê°€ parallel í•˜ê²Œ ì²˜ë¦¬í•˜ë„ë¡ ì§€ì‹œí•¨ 
