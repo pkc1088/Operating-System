@@ -12,15 +12,15 @@ int main() {
         return 1;
     } 
     else if(pid == 0) { //child process
-        execlp("/bin/ls", "ls", NULL);      //ls ¶ó´Â ¸í·É¾î ½ÇÇà
+        execlp("/bin/ls", "ls", NULL);      //ls ë¼ëŠ” ëª…ë ¹ì–´ ì‹¤í–‰
         printf("\n");
     }
     else {              //parent (pid > 0)
-        wait(NULL);     //wait ¾ÈÇØÁÖ¸é child process ¾È ±â´Ù¸®°í ¸ÕÀúÃâ·ÂÇÔ
+        wait(NULL);     //wait ì•ˆí•´ì£¼ë©´ child process ì•ˆ ê¸°ë‹¤ë¦¬ê³  ë¨¼ì €ì¶œë ¥í•¨
         printf("Child Complete\n");
     }
-    // exit() ÄÚµå·Î Á¾·á½ÃÅ³¼ö ÀÖ´Âµ¥ ÀÚ½ÄÀÌ ¾È³¡³ª´Âµ¥ ºÎ¸ð¸¦ Á¾·á½ÃÅ°¸é orphan process
-    // ºÎ¸ð°¡ Á¾·áµÇÁø ¾Ê¾ÒÀ¸³ª ±×³É ÁøÇàµÇ¸é zombie process°¡ µÊ
+    // exit() ì½”ë“œë¡œ ì¢…ë£Œì‹œí‚¬ìˆ˜ ìžˆëŠ”ë° ìžì‹ì´ ì•ˆëë‚˜ëŠ”ë° ë¶€ëª¨ë¥¼ ì¢…ë£Œì‹œí‚¤ë©´ orphan process
+    // ë¶€ëª¨ê°€ ì¢…ë£Œë˜ì§„ ì•Šì•˜ìœ¼ë‚˜ ê·¸ëƒ¥ ì§„í–‰ë˜ë©´ zombie processê°€ ë¨
 
     return 0;
 }
