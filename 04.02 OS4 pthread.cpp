@@ -5,11 +5,11 @@
 int sum; /* this data is shared by the thread(s) */
 
 void *runner(void *param); /* the thread */	
-// void *  = ¹İÈ¯ÇüÀÌ Á¤ÇØÁöÁö ¾ÊÀº ÇüÅÂ (¿ªÂüÁ¶·Î ±× °ªÀ» »ç¿ëÇÒ ¼ø ¾øÀ½) 
+// void *  = ë°˜í™˜í˜•ì´ ì •í•´ì§€ì§€ ì•Šì€ í˜•íƒœ (ì—­ì°¸ì¡°ë¡œ ê·¸ ê°’ì„ ì‚¬ìš©í•  ìˆœ ì—†ìŒ) 
 int main(int argc, char *argv[])
 {
 pthread_t tid; /* the thread identifier */
-pthread_attr_t attr; /* set of attributes for the thread ÇÊ¼ö ¾Æ´Ô*/
+pthread_attr_t attr; /* set of attributes for the thread í•„ìˆ˜ ì•„ë‹˜*/
 
 if (argc != 2) {
 	fprintf(stderr,"usage: a.out <integer value>\n");
@@ -58,7 +58,7 @@ sum = 0;
 
 
 /*
-argv 2°³ ÁÖ´Â °æ¿ì ±¸ÇöÇØº½ 
+argv 2ê°œ ì£¼ëŠ” ê²½ìš° êµ¬í˜„í•´ë´„ 
  
 #include <pthread.h>
 #include <stdio.h>
