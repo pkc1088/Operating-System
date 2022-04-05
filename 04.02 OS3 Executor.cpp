@@ -22,11 +22,11 @@ public class Main
 {
     public static void main(String[] args) {
             int upper = 10;
-            //runnable °ú ´Ş¸® return À» ÇÒ ¼ö ÀÖ´Ù
+            //runnable ê³¼ ë‹¬ë¦¬ return ì„ í•  ìˆ˜ ìˆë‹¤
             ExecutorService pool = Executors.newSingleThreadExecutor();
             Future<Integer> result = pool.submit(new Summation(upper));
-            //callableÅÂ½ºÅ©¸¦ ½º·¹µå¿¡ Á¦Ãâ(submit)ÇÏ¸é, ½º·¹µå°¡ ¹İÈ¯ÇÏ´Â
-            //future°´Ã¼ÀÇ get() ¸Ş¼Òµå¸¦ È£ÃâÇÏ¿© °á°ú¸¦ ±â´Ù¸°´Ù.
+            //callableíƒœìŠ¤í¬ë¥¼ ìŠ¤ë ˆë“œì— ì œì¶œ(submit)í•˜ë©´, ìŠ¤ë ˆë“œê°€ ë°˜í™˜í•˜ëŠ”
+            //futureê°ì²´ì˜ get() ë©”ì†Œë“œë¥¼ í˜¸ì¶œí•˜ì—¬ ê²°ê³¼ë¥¼ ê¸°ë‹¤ë¦°ë‹¤.
             try {
                 System.out.println("sum = " + result.get());
             }
