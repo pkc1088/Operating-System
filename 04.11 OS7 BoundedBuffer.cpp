@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < numOfProducers; i++)
         pthread_create(&tid, NULL, producer, NULL);
-    for(int i = 0; i < numOfProducers; i++)
+    for(int i = 0; i < numOfConsumers; i++)
         pthread_create(&tid, NULL, consumer, NULL);
     
     sleep(5);
