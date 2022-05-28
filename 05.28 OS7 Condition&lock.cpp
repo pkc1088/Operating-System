@@ -1,28 +1,28 @@
 /*
-ÀÏ´Ü synchronized¿¡ ºñÇØ¼­?ReentrantLockÀÌ ÈÎ¾À ¼¼ºÎÀûÀ¸·Î µ¿±âÈ­°¡ °¡´ÉÇÕ´Ï´Ù.±×¸®°í °¡Àå Å« Â÷ÀÌÁ¡Àº?synchronized´Â ¾Ï¹¬ÀûÀÌ°í, 
-ReentrantLockÀº ¸í½ÃÀûÀÌ¶ó´Â °ÍÀÌÁÒ.¸ðµç ¸Þ¼Òµå°¡ ¸í½ÃÀûÀ¸·Î Ç¥ÇöµÇ¾î ÀÖ°í, ±×·ÎÀÎÇØ¼­ »ç¿ëÇÏ´Â °Íµµ ¸í½ÃÀûÀ¸·Î »ç¿ëµË´Ï´Ù.
+ì¼ë‹¨ synchronizedì— ë¹„í•´ì„œ?ReentrantLockì´ í›¨ì”¬ ì„¸ë¶€ì ìœ¼ë¡œ ë™ê¸°í™”ê°€ ê°€ëŠ¥í•©ë‹ˆë‹¤.ê·¸ë¦¬ê³  ê°€ìž¥ í° ì°¨ì´ì ì€?synchronizedëŠ” ì•”ë¬µì ì´ê³ , 
+ReentrantLockì€ ëª…ì‹œì ì´ë¼ëŠ” ê²ƒì´ì£ .ëª¨ë“  ë©”ì†Œë“œê°€ ëª…ì‹œì ìœ¼ë¡œ í‘œí˜„ë˜ì–´ ìžˆê³ , ê·¸ë¡œì¸í•´ì„œ ì‚¬ìš©í•˜ëŠ” ê²ƒë„ ëª…ì‹œì ìœ¼ë¡œ ì‚¬ìš©ë©ë‹ˆë‹¤.
 
-¡à Lock Å¬·¡½º
-  - synchronized ºí·°À» ÀÌ¿ëÇÑ µ¿±âÈ­ ½Ã °°Àº ¸Þ¼Òµå ³»¿¡¸¸ lockÀ» °É ¼ö ÀÖ´Ù´Â Á¦¾à»çÇ×À» ÇØ°áÇÏ±â À§ÇÑ Å¬·¡½ºÀÌ´Ù.
-  - ÀÌ¸¦ ÀÌ¿ëÇÏ¸é ´ÜÀÏ ºí·°ÀÇ ÇüÅÂ·Î ÀÓ°è¿µ¿ªÀ» ¼³Á¤ÇØ¾ß ÇÏ´Â ÇÑ°è¸¦ ±Øº¹ÇÒ ¼ö ÀÖ´Ù.
+â–¡ Lock í´ëž˜ìŠ¤
+  - synchronized ë¸”ëŸ­ì„ ì´ìš©í•œ ë™ê¸°í™” ì‹œ ê°™ì€ ë©”ì†Œë“œ ë‚´ì—ë§Œ lockì„ ê±¸ ìˆ˜ ìžˆë‹¤ëŠ” ì œì•½ì‚¬í•­ì„ í•´ê²°í•˜ê¸° ìœ„í•œ í´ëž˜ìŠ¤ì´ë‹¤.
+  - ì´ë¥¼ ì´ìš©í•˜ë©´ ë‹¨ì¼ ë¸”ëŸ­ì˜ í˜•íƒœë¡œ ìž„ê³„ì˜ì—­ì„ ì„¤ì •í•´ì•¼ í•˜ëŠ” í•œê³„ë¥¼ ê·¹ë³µí•  ìˆ˜ ìžˆë‹¤.
 
-¡à Lock Å¬·¡½ºÀÇ Á¾·ù
-  - ReentrantLock Å¬·¡½º
-    . ÀçÁøÀÔ °¡´ÉÇÑ lock, °¡Àå ÀÏ¹ÝÀûÀÎ ¹èÅ¸ lock
-    . Æ¯Á¤ Á¶°Ç¿¡¼­ lockÀ» Ç®°í, ³ªÁß¿¡ ´Ù½Ã lockÀ» ¾ò¾î ÀÓ°è¿µ¿ªÀ¸·Î ÁøÀÔ °¡´É
-  - ReentrantReadWriteLock Å¬·¡½º
-    . ÀÐ±â¸¦ À§ÇÑ lock°ú ¾²±â¸¦ À§ÇÑ lockÀ» µû·Î Á¦°ø
-    . ÀÐ±â¿¡´Â °øÀ¯ÀûÀÌ°í, ¾²±â¿¡´Â ¹èÅ¸ÀûÀÎ lock
-    . ÀÐ±â lockÀÌ °É·ÁÀÖ´Â °æ¿ì, ´Ù¸¥ ½º·¹µåµéµµ ÀÐ±â¶ó¸é ÁøÀÔ °¡´É (read-only)
-    . ÀÐ±â lockÀÌ °É·ÁÀÖ´Â °æ¿ì, ´Ù¸¥ ½º·¹µå°¡ ¾²±â lockÀº ±ÝÁö (µ¥ÀÌÅÍ º¯°æ ¹æÁö)
-  - StampedLock Å¬·¡½º 
-    . ReentrantReadWriteLock¿¡ ³«°üÀûÀÎ lockÀÇ ±â´ÉÀ» Ãß°¡
-    . ³«°üÀûÀÎ ÀÐ±â lockÀº ¾²±â lock¿¡ ÀÇÇØ ¹Ù·Î ÇØÁ¦ °¡´É
-    . ¹«Á¶°Ç ÀÐ±â lockÀ» °ÉÁö ¾Ê°í, ¾²±â¿Í ÀÐ±â°¡ Ãæµ¹ÇÒ ¶§¸¸ ¾²±â ÈÄ ÀÐ±â lock
+â–¡ Lock í´ëž˜ìŠ¤ì˜ ì¢…ë¥˜
+  - ReentrantLock í´ëž˜ìŠ¤
+    . ìž¬ì§„ìž… ê°€ëŠ¥í•œ lock, ê°€ìž¥ ì¼ë°˜ì ì¸ ë°°íƒ€ lock
+    . íŠ¹ì • ì¡°ê±´ì—ì„œ lockì„ í’€ê³ , ë‚˜ì¤‘ì— ë‹¤ì‹œ lockì„ ì–»ì–´ ìž„ê³„ì˜ì—­ìœ¼ë¡œ ì§„ìž… ê°€ëŠ¥
+  - ReentrantReadWriteLock í´ëž˜ìŠ¤
+    . ì½ê¸°ë¥¼ ìœ„í•œ lockê³¼ ì“°ê¸°ë¥¼ ìœ„í•œ lockì„ ë”°ë¡œ ì œê³µ
+    . ì½ê¸°ì—ëŠ” ê³µìœ ì ì´ê³ , ì“°ê¸°ì—ëŠ” ë°°íƒ€ì ì¸ lock
+    . ì½ê¸° lockì´ ê±¸ë ¤ìžˆëŠ” ê²½ìš°, ë‹¤ë¥¸ ìŠ¤ë ˆë“œë“¤ë„ ì½ê¸°ë¼ë©´ ì§„ìž… ê°€ëŠ¥ (read-only)
+    . ì½ê¸° lockì´ ê±¸ë ¤ìžˆëŠ” ê²½ìš°, ë‹¤ë¥¸ ìŠ¤ë ˆë“œê°€ ì“°ê¸° lockì€ ê¸ˆì§€ (ë°ì´í„° ë³€ê²½ ë°©ì§€)
+  - StampedLock í´ëž˜ìŠ¤ 
+    . ReentrantReadWriteLockì— ë‚™ê´€ì ì¸ lockì˜ ê¸°ëŠ¥ì„ ì¶”ê°€
+    . ë‚™ê´€ì ì¸ ì½ê¸° lockì€ ì“°ê¸° lockì— ì˜í•´ ë°”ë¡œ í•´ì œ ê°€ëŠ¥
+    . ë¬´ì¡°ê±´ ì½ê¸° lockì„ ê±¸ì§€ ì•Šê³ , ì“°ê¸°ì™€ ì½ê¸°ê°€ ì¶©ëŒí•  ë•Œë§Œ ì“°ê¸° í›„ ì½ê¸° lock
 
-¡à Condition Å¬·¡½º
-  - Æ¯Á¤ ½º·¹µå¸¦ À§ÇÑ Conditon ÀÎ½ºÅÏ½º¸¦ ¸¸µé¾î ½º·¹µå º°·Î wait poolÀ» ¸¸µé¾îÁÖ´Â ±â´ÉÀ» ÇÑ´Ù.
-  - ÀÌ¸¦ ÀÌ¿ëÇÏ¿© ±ú¿ì°í ½ÍÀº Æ¯Á¤ ½º·¹µå¸¸ ±ú¿ì´Â °ÍÀÌ °¡´ÉÇÏ´Ù.
+â–¡ Condition í´ëž˜ìŠ¤
+  - íŠ¹ì • ìŠ¤ë ˆë“œë¥¼ ìœ„í•œ Conditon ì¸ìŠ¤í„´ìŠ¤ë¥¼ ë§Œë“¤ì–´ ìŠ¤ë ˆë“œ ë³„ë¡œ wait poolì„ ë§Œë“¤ì–´ì£¼ëŠ” ê¸°ëŠ¥ì„ í•œë‹¤.
+  - ì´ë¥¼ ì´ìš©í•˜ì—¬ ê¹¨ìš°ê³  ì‹¶ì€ íŠ¹ì • ìŠ¤ë ˆë“œë§Œ ê¹¨ìš°ëŠ” ê²ƒì´ ê°€ëŠ¥í•˜ë‹¤.
 */ 
 
 import java.util.concurrent.locks.Condition;
@@ -58,8 +58,8 @@ class Cleaner implements Runnable {
     private Condition forCleaner;
     private Condition forPerson;
 
-    // ÇØ´ç Ã»¼ÒºÎ°¡ °ü¸®ÇÏ´Â È­Àå½Ç µî·Ï
-    // lock, lockÀ» À§ÇÑ Condition ÀÎ½ºÅÏ½º »ý¼º
+    // í•´ë‹¹ ì²­ì†Œë¶€ê°€ ê´€ë¦¬í•˜ëŠ” í™”ìž¥ì‹¤ ë“±ë¡
+    // lock, lockì„ ìœ„í•œ Condition ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
     public Cleaner(Toilet toilet, ReentrantLock lock, Condition forCleaner, Condition forPerson) {
         this.toilet = toilet;
         this.lock = lock;
@@ -78,23 +78,23 @@ class Cleaner implements Runnable {
     
         while (true) {
             
-            // È­Àå½ÇÀº È¥ÀÚ¸¸ »ç¿ë °¡´É
-            // ¿©·¯ ½º·¹µå°¡ Á¢±ÙÇÏÁö ¸øÇÑ´Ù.
-            // Àá°ÜÀÖ´Ù¸é lockÀ» ÀâÀ»¶§±îÁö Àá½Ã ´ë±â
+            // í™”ìž¥ì‹¤ì€ í˜¼ìžë§Œ ì‚¬ìš© ê°€ëŠ¥
+            // ì—¬ëŸ¬ ìŠ¤ë ˆë“œê°€ ì ‘ê·¼í•˜ì§€ ëª»í•œë‹¤.
+            // ìž ê²¨ìžˆë‹¤ë©´ lockì„ ìž¡ì„ë•Œê¹Œì§€ ìž ì‹œ ëŒ€ê¸°
             lock.lock();
             try {
                 
-                // ÈÞÁö¸¦ ÃæÀüÇÒ ÇÊ¿ä°¡ ¾ø´Ù¸é ÇÏÁö ¾Ê´Â´Ù.
+                // íœ´ì§€ë¥¼ ì¶©ì „í•  í•„ìš”ê°€ ì—†ë‹¤ë©´ í•˜ì§€ ì•ŠëŠ”ë‹¤.
                 if (toilet.getPaper() <= 0) {
                     System.out.println(name + " replaces toilet paper.");
                     replacePaper(5);
-                    // ´Ù¸¥ »ç¶÷µé¿¡°Ô È­Àå½ÇÀÌ »ç¿ë °¡´ÉÇÔÀ» ¾Ë·ÁÁØ´Ù.
+                    // ë‹¤ë¥¸ ì‚¬ëžŒë“¤ì—ê²Œ í™”ìž¥ì‹¤ì´ ì‚¬ìš© ê°€ëŠ¥í•¨ì„ ì•Œë ¤ì¤€ë‹¤.
                     System.out.println("Finish. Wake everybody.");
                     forPerson.signalAll();
                 }
                 
                 try {
-                    // ¾ÆÁ÷ ÈÞÁö°¡ ÃæºÐÇÏ¸é ¹Ù·Î È­Àå½ÇÀ» ³ª¿Í¼­ ÀÚ½ÅÀÇ ´ë±â½Ç·Î ÀÌµ¿
+                    // ì•„ì§ íœ´ì§€ê°€ ì¶©ë¶„í•˜ë©´ ë°”ë¡œ í™”ìž¥ì‹¤ì„ ë‚˜ì™€ì„œ ìžì‹ ì˜ ëŒ€ê¸°ì‹¤ë¡œ ì´ë™
                     System.out.println(name + " Go to wait.");
                     forCleaner.await();
                     Thread.sleep(500);
@@ -122,8 +122,8 @@ class Person implements Runnable {
     private Condition forCleaner;
     private Condition forPerson;
 
-    // »ç¿ëÇØ¾ßÇÏ´Â È­Àå½ÇÀ» ÁöÁ¤
-    // lock, lockÀ» À§ÇÑ Condition ÀÎ½ºÅÏ½º »ý¼º
+    // ì‚¬ìš©í•´ì•¼í•˜ëŠ” í™”ìž¥ì‹¤ì„ ì§€ì •
+    // lock, lockì„ ìœ„í•œ Condition ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
     public Person(Toilet toilet, ReentrantLock lock, Condition forCleaner, Condition forPerson) {
         this.toilet = toilet;
         this.lock = lock;
@@ -132,13 +132,13 @@ class Person implements Runnable {
 
     }
 
-    // È­Àå½ÇÀÇ ÈÞÁö°¡ ÀÖ´ÂÁö È®ÀÎ
+    // í™”ìž¥ì‹¤ì˜ íœ´ì§€ê°€ ìžˆëŠ”ì§€ í™•ì¸
     public boolean checkToilet() {
         return toilet.getPaper() >= 1;
     }
 
     public void usePaper() {
-        // ÈÞÁö ÇÏ³ª »ç¿ë ÈÄ ³ª¸ÓÁö ÈÞÁö¸¦
+        // íœ´ì§€ í•˜ë‚˜ ì‚¬ìš© í›„ ë‚˜ë¨¸ì§€ íœ´ì§€ë¥¼
         toilet.usedPaper();
     }
 
@@ -147,21 +147,21 @@ class Person implements Runnable {
         String name = Thread.currentThread().getName();
         while (true) {
         
-            // È­Àå½ÇÀº ÇÑ»ç¶÷¸¸ »ç¿ë °¡´É
+            // í™”ìž¥ì‹¤ì€ í•œì‚¬ëžŒë§Œ ì‚¬ìš© ê°€ëŠ¥
             lock.lock();
             
             try {
                 
-                // È­Àå½Ç¿¡ ÈÞÁö°¡ ÀÖ´ÂÁö È®ÀÎ
-                // ÈÞÁö ¾øÀ¸¸é °è¼Ó ´ë±â
+                // í™”ìž¥ì‹¤ì— íœ´ì§€ê°€ ìžˆëŠ”ì§€ í™•ì¸
+                // íœ´ì§€ ì—†ìœ¼ë©´ ê³„ì† ëŒ€ê¸°
                 while (toilet.getPaper() < 1) {
                 
                     System.out.println(name + " is waiting for replacing paper.");
                     
                     try {
-                        // ´ë±â ÁßÀÎ Ã»¼ÒºÎ ¼ÒÈ¯
+                        // ëŒ€ê¸° ì¤‘ì¸ ì²­ì†Œë¶€ ì†Œí™˜
                         forCleaner.signal();
-                        // ÈÞÁö°¡ ¾øÀ¸¹Ç·Î ´ë±â pool·Î ÀÌµ¿
+                        // íœ´ì§€ê°€ ì—†ìœ¼ë¯€ë¡œ ëŒ€ê¸° poolë¡œ ì´ë™
                         forPerson.await();
                         Thread.sleep(500);
                         System.out.println(name + " wakes.");
@@ -172,15 +172,15 @@ class Person implements Runnable {
                     }
                 }
             
-                // È­Àå½Ç º¼ ÀÏÀ» º¸°í ÈÞÁö¸¦ »ç¿ë ÈÄ È­Àå½Ç ½Ã¿ëÀ» Á¾·á
+                // í™”ìž¥ì‹¤ ë³¼ ì¼ì„ ë³´ê³  íœ´ì§€ë¥¼ ì‚¬ìš© í›„ í™”ìž¥ì‹¤ ì‹œìš©ì„ ì¢…ë£Œ
                 System.out.println(name + " uses toilet.");
                 usePaper();
                 try {
-                    // ÈÞÁö°¡ ¾øÀ¸¸é ´Ù¸¥ »ç¶÷À» À§ÇØ Ã»¼ÒºÎ¿¡°Ô ¾Ë¸°´Ù.
+                    // íœ´ì§€ê°€ ì—†ìœ¼ë©´ ë‹¤ë¥¸ ì‚¬ëžŒì„ ìœ„í•´ ì²­ì†Œë¶€ì—ê²Œ ì•Œë¦°ë‹¤.
                     if (toilet.getPaper() <= 0) {
                         forCleaner.signal();
                     }
-                    // ÀÚ½ÅÀº È­Àå½ÇÀ» ³ª°£´Ù.
+                    // ìžì‹ ì€ í™”ìž¥ì‹¤ì„ ë‚˜ê°„ë‹¤.
                     forPerson.await();
                     Thread.sleep(500);
                 } 
@@ -205,17 +205,17 @@ public class MainClass {
 
     public static void main(String[] args) {
         
-        // °ü¸®ÇÏ´Â È­Àå½ÇÀ» ÁöÁ¤
+        // ê´€ë¦¬í•˜ëŠ” í™”ìž¥ì‹¤ì„ ì§€ì •
         Cleaner cleaner = new Cleaner(toilet, lock, forCleaner, forPerson);
         Thread cleanerThread = new Thread(cleaner, "Cleaner");
         cleanerThread.start();
 
         Person[] people = new Person[5];
         for (int i = 0; i < people.length; i++) {
-            // »ç¶÷ °´Ã¼ »ý¼º, ÀÌ »ç¶÷ÀÌ »ç¿ëÇØ¾ßÇÏ´Â È­Àå½Çµµ ÁöÁ¤
+            // ì‚¬ëžŒ ê°ì²´ ìƒì„±, ì´ ì‚¬ëžŒì´ ì‚¬ìš©í•´ì•¼í•˜ëŠ” í™”ìž¥ì‹¤ë„ ì§€ì •
             people[i] = new Person(toilet, lock, forCleaner, forPerson);
             Thread th = new Thread(people[i], "Person-" + i);
-            // »ç¶÷ °´Ã¼¸¦ Çàµ¿½ÃÅ°´Â ½º·¹µå¸¦ ½ÇÇà
+            // ì‚¬ëžŒ ê°ì²´ë¥¼ í–‰ë™ì‹œí‚¤ëŠ” ìŠ¤ë ˆë“œë¥¼ ì‹¤í–‰
             th.start();
         }
     }
