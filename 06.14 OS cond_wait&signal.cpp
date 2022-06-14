@@ -1,5 +1,5 @@
-// 1¾¿ Áõ°¡µÇ´Â°Ô Ãâ·ÂµÇ´Â°Ç ¼øÀüÈ÷ sleep(1) ¶§¹®ÀÎ°Å°°À½
-//signal condwait ´Ù½Ã °øºÎÇÏ±â
+// 1ì”© ì¦ê°€ë˜ëŠ”ê²Œ ì¶œë ¥ë˜ëŠ”ê±´ ìˆœì „íˆ sleep(1) ë•Œë¬¸ì¸ê±°ê°™ìŒ
+//signal condwait ë‹¤ì‹œ ê³µë¶€í•˜ê¸°
 
 #include <pthread.h> 
 #include <string.h> 
@@ -28,9 +28,9 @@ void *increase(void *arg){
 void *printData(void *arg){ 
     while(1){ 
         pthread_mutex_lock(&mutex); 
-        pthread_cond_wait(&cond, &mutex); 
-        printf("print data :%d\n", data); 
-        pthread_mutex_unlock(&mutex); 
+        pthread_cond_wait(&cond, &mutex);   //waitëŠ” mutexë¥¼ unlockì‹œí‚¤ê³  ê¸°ë‹¤ë¦¬ë‹¤ê°€ signal ë°›ìœ¼ë©´ 
+        printf("print data :%d\n", data);   //mutexë¥¼ lockì‹œí‚¤ê³  ë‹¤ìŒêº¼ ì‹¤í–‰í•¨ ê·¸ë˜ì„œ
+        pthread_mutex_unlock(&mutex);       //unlock í•„ìˆ˜ì¸ë“¯
     } 
 } 
 int main(int argc, char *argv[]) {
