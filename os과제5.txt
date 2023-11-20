@@ -1,0 +1,48 @@
+6.3 
+Explain why spinlocks are not appropriate for single-processor systems
+yet are often used in multiprocessor systems.
+
+
+6.6
+Race conditions are possible in many computer systems. Consider a
+banking system that maintains an account balance with two functions:
+deposit(amount) and withdraw(amount). These two functions are
+passed the amount that is to be deposited or withdrawn from the bank
+account balance. Assume that a husband and wife share a bank account.
+Concurrently, the husband calls the withdraw() function, and the wife
+calls deposit(). Describe how a race condition is possible and what
+might be done to prevent the race condition from occurring
+
+
+6.10
+The compare and swap() instruction can be used to design lock-free
+data structures such as stacks, queues, and lists. The program example
+shown in Figure 6.17 presents a possible solution to a lock-free stack
+using CAS instructions, where the stack is represented as a linked list
+of Node elements with top representing the top of the stack. Is this
+implementation free from race conditions?
+
+
+6.13
+The first known correct software solution to the critical-section problem
+for two processes was developed by Dekker. The two processes, P0 and
+P1, share the following variables:
+	boolean flag[2]; /* initially false */
+	int turn;
+The structure of process Pi (i == 0 or 1) is shown in Figure 6.18. The
+other process is Pj (j == 1 or 0). Prove that the algorithm satisfies all
+three requirements for the critical-section problem
+
+
+6.24
+In Section 6.7, we use the following illustration as an incorrect use of
+semaphores to solve the critical-section problem:
+
+wait(mutex);
+...
+critical section
+...
+wait(mutex);
+Explain why this is an example of a liveness failure.
+
+

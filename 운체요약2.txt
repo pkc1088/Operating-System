@@ -1,0 +1,338 @@
+<6장>
+
+Critical section problem
+1. Mutual Exclusion
+2. Progress (avoid deadlock)
+3. Bounded Waitiing (avoid starvation)
+
+https://jhnyang.tistory.com/37
+
+Mutual exclustion (상호배제)
+Pi는 'flag[j] = false' or 'turn = i' 일때 CS에 접근 가능함
+
+Progress (진행성)
+둘 중 하나는 항상 진입할 수 있는 가능성을 보장합니다. 
+어떤 프로세스가 임계 영역에 들어가고자 할 때, 다른 프로세스가 임계 영역에 진입하지 않을 경우, 
+해당 프로세스는 반드시 진입할 수 있습니다. (while 내에서  turn 값을 바꾸지 않으니까)
+
+Bounded Waiting (한정된 대기)
+모든 프로세스가 유한한 시간 내에 자원에 접근할 수 있어야 함. (flag[i,j] = false를 통해서)
+
+그러나 OS가 성능향상을 위해 코드를 reordering할 수 있으므로 완벽하진 않음.
+pi turn=j 이후 pj에서 turn, flag 설정한 뒤 cs 진입하는데 그 사이 다시 pi로 넘어가면
+pi에서 flag[i] = true 후 조건 따질때 turn = i로 되어있으니 cs로 pi도 들어가 cs에 두 프로세스가 접근됨
+
+TestAndSet 
+전달된 파라미터에 true를 주면서 해당 파라미터의 원래 있었던 값을 리턴함
+Mutual ex, progress 만족, bounded waiting 불만족(프로세스 도착순서와 무관하게 임계구역에 진입할 프로세스가 정해지기때문)
+
+CompareAndSwap
+항상 value의 원래 값을 리턴하되 조건 맞으면 new value로 바꿔줌
+bounded waiting 불만족 (CAS 연산을 수행하기 위해 대기하는 동안 다른 프로세스가 값을 변경하는 경우, 대기 시간이 무한히 늘어날 수 있습니다.)
+
+Mutex
+acquire(), release()
+
+Semaphore
+wait()-감소, signal()-증가
+wait에 sleep()-자기 호출한 프로세스 일시 중지, signal에 wakeup()-일시중지된 프로세스의 실행 재개
+같은 세마포어에 대해 두 프로세스가 동시에 wait()와 signal()을 실행할 수 없도록 보장해야함.
+-> 이게 오히려 cs문제가 될 수 있음
+
+Monitors
+wait() : 이 연산을 호출한 프로세스는 일시 중지 되어야한다
+signal() : 다른 프로세스가 이 시그널을 호출할때 까지 (다른 중지된 프로세스를 재개시킴)
+(그림보기)
+
+P가 x.signal로 중지된 Q의 스레드를 재개시킬때
+Signal and wait : P는 Q가 모니터를 떠날 떄 까지 기다리거나 다른 조건을 기다린다.
+Signal and continue : Q는 P가 모니터를 떠날 때까지 기다리거나 다른 조건을 기다린다.
+대부분의 OS는 signal and wait 지원(P가 계속 실행되도록 허용하면 Q가 재개될때 해당 논리적 조건이 더 이상 유지되지 않을 수 있으니)
+
+모니터내에서 프로세스 수행 재개시 x.wait(c)를 하면 c(우선순위)에 해당하는 프로세스가 일시중지된다.
+x.signal() 이 수행되면 가장 작은 우선순위 번호를 가진 프로세스가 수행 재개된다.
+
+Liveness : 프로세스가 진행되기 위해 만족시켜야할 속성들.
+실패 예 : 무한 루프, 교착상태
+
+
+<7장>
+'First' reader writer problem
+-writer가 공유 객체를 사용할 허가를 얻지 못했다면, reader들을 기다리게 해서는 안됨
+'Second' reader writer problem
+-writer가 작성 준비가 되면 가능한 빨리 작성을 수행해야함
+
+'First'(wirter)와 'Second'(reader) 모두 기아를 야기할 수 있음.
+->커널이 재공하는 reader-writer lock을 이용해 해결가능
+
+Dining Philospher Problem
+단순히 자신의 오른쪽(i), 왼쪽(i+1 % 5) 젓가락에 wait걸어놓고 쓴 후 signal로 내려놓는 방법
+-> 교착상태 빠질 수 있음
+
+양쪽 젓가락을 모두 얻을 수 있을때만 젓가락을 집을 수 있도록 강제해야함.(상태 enum을 사용)
+-왼쪽 오른쪽 state가 EATING이 아닐때 식사가능
+->이것도 상호배제와 교착은 만족하지만 starvation은 여전함
+
+Kernel Synchronization-window
+커널 내부 스레드 관리 : interrupt mask, spinlock 사용
+커널 외부 스레드 관리 : dispatcher objects 사용(뮤텍스, 세마포어, Events(condition variable), Timers)
+
+POSIX Sempahores
+Named sempahore : unrelated process에도 사용가능(다른 프로세스에서 그 이름을 매개변수로 넣고 쓸 수 있음)
+Unamed semaphore : cannot
+
+Java Monitors
+'synchronized'로 선언되면 호출된 스레드는 그 객체에 대한 lock을 가져야 진입가능
+해당 object에 대한 lock을 소유한 thread가 없으면 caller가 lock을 소유하고 method 수행,
+다른 thread가 이미 lock을 소유하고 있으면 호출 thread는 block되고 entry set(진입 집합)에 배치,
+lock 소유한 thread가 method 종료하면 JVM은 entry set 대기중인 thread 중 하나를 임의로 진입시킴
+
+wait set(대기 집합) : lock을 소유하고 메소드 수행 중 조건 충족되지 않아 계속 수행될 수 없는 경우
+(그림 보기)
+
+스레드가 wait()를 호출하면
+1. 스레드가 객체의 락을 해제함
+2. 스레드 상태가 blocked로 셋팅됨
+3. 스레드는 그 객체의 wait set에 넣어짐
+
+스레드가 notify()를 호출하면
+1. wait set의 임의의 thread가 선택됨
+2. 그 스레드를 entry set으로 이동시킴
+3. 그 스레드를 blocked 상태에서 runnable 상태로 설정함
+->이제 이 스레드는 다른 스레드와 락 경쟁을 할 수 있음
+
+만약 unlock() 메서드가 try 블록 안에 구현되어 예외가 발생하면, 해당 예외가 잠금 해제 코드를 건너뛰고 예외를 
+처리하는 부분으로 이동할 수 있습니다. 이 경우 잠금이 해제되지 않고 잠금을 소유한 스레드가 아직 잠금을 
+보유한 상태로 남아있을 수 있습니다. finally 블록에 unlock() 메서드를 구현함으로써, 잠금 해제가 보장되고 다른 
+스레드가 잠금을 획득할 수 있도록 합니다.
+
+
+<8장>
+
+Deadlock : 각자 공유 자원 일부를 할당 받은 상태에서 자신이 속한 집합의 다른 프로세스가 가지고 있는
+              다른 공유자원의 획득을 기다리며 block된 프로세스의 집합
+
+데드락 발생 조건 4가지
+1. 상호배제 : 최소 하나의 자원이 non-sharable(한 번에 한 스레드만이 그 자원을 사용할 수 있음) 해야함 
+2. Hold and wait : 스레드는 최소한 하나의 자원을 점유한 채 다른 스레드의 자원을 얻기 위해 대기해야함
+3. 비선점 
+4. Circular wait(순환대기) : T0~Tn이 있을때 T0는 T1의 자원을 대기하고 T1은 T2의 자원을 얻으려고 대기해야함
+
+request edge : Pi -> Rj	(process Pi requests a resource Rj instance)
+assignment edge : Rj -> Pi    (process Pi holds a resource Rj instance)
+
+데드락 판단시
+1. 그래프내 사이클이 없으면 교착상태 없음
+2. 사이클이 존재하면 교착상태가 있을 수도 있음(instance하나일 시 - circular wait가 발생해서)
+->사이클 있지만 resource들이 instance를 두 개 이상 가지고 있으면 안생김
+
+Deadlock Prevention : 프로세스들이 데드락에 절대 걸리지 않게 예방함
+위 4가지 조건중 하나를 제거해줌
+1. 상호배제 : 모든 리소스를 sharable하게 하는건 동시성 문제를 일으키므로 상호배제를 무효화하는건 불가능함
+2. Hold and wait : 리소스 이용률 떨어뜨리고 기아 발생시킬 수 있음
+3. 비선점 : 선점으로 만들어버릴시 '상태를 쉽게 저장하고 복원시킬 수 있는 자원'이 아닐시 현실적으로 어렵다
+4. Circular wait : 모든 리소스에 대해 순서를 배정하고 프로세스가 오름차순으로 자원을 요청하도록하면 가능
+
+Deadlock Avoidance : 자원이 어떻게 요청될지에 대한 추가 정보를 제공하도록 요구하는 것
+즉 각 프로세스가 자신의 수명동안 요구할 수 있는 최대 리소스 개수를 선언하게 함
+
+Safe state : 스레드들이 요청하는 모든 자원을 교착 상태를 야기시키지 않고 차례로 모두 할당 해줄수 있다는 뜻
+safe state이면 교착상태 발생 x, unsafe state이면 deadlock 발생할 가능성 있음
+
+Avoidance Alogrithm
+single instacne : resource-allocation graph 사용
+multi instance : Banker's algorithm 사용
+
+allocation graph algorithm 
+claim edge Ti -> Rj 즉 Ti가 Rj를 요청한다고할때 claim edge는 request edge로 변환되고
+request edge Ti -> Rj를 assignment edge Rj -> Ti로 변환해도
+사이클이 형성되지 않을때만 요청을 허용할 수 있음
+
+Banker's algorithm
+자료 참고
+
+Wait-for Graph
+모든 자원이 한 개의 인스턴스만 있을때 그릴 수 있음
+리소스 재끼고 프로세스들(스레드)끼리만 연결시킴
+
+Detection algorithm
+자료 참고
+
+Banker's algorithm은 리소스를 안전하게 할당받을 수 있는지 미리 예측하여 데드락을 방지하는 방식이고, 
+Deadlock detection algorithm은 현재 시스템 상태에서 데드락을 탐지하여 조치를 취하는 방식입니다.
+
+
+<9장>
+
+base와 limit 레지스터를 이용해서 프로세스가 자신이 속한 주소에만 접근할 수 있도록 함
+유저모드에서 메모리 접근할때 base register~limit register 사이인지 cpu가 체크해야함
+
+바인딩 : 한 주소 공간에서 다른 주소 공간으로 맵핑하는것
+바인딩 시점에 따라
+1. 컴파일 시점 : 프로세스가 메모리 내에 들어갈 위치를 컴파일 시간에 미리 알 수 있으면 컴파일러는 절대코드를 생성함
+2. 적재시간 : 그걸 컴파일 시점에 알지 못하면 이진코드를 '재배치 가능 코드'로 만듬.
+                바인딩은 프로그램이 메인메모리로 실제 적재되는 시간에 이루어짐
+3. 실행시간 : 프로세스가 실행 중간에 메모리 내의 한 세그에서 다른 세그로 옮겨질 수 있을때 발생
+(그림 참고)
+
+논리주소 : cpu가 생성하는 주소
+물리주소 : 메모리가 취급하는 주소
+컴파일 또는 적재 시에 주소 바인딩하면 논리주소==물리주소
+실행시간 바인딩에서는 둘이 다르다.
+
+MMU : 프로그램 실행중 가상주소->물리주소 변환 장치
+base register == relocation register
+논리주소는 mmu통과할때 이 relocation register의 값이 더해져 물리주소가 됨
+사용자는 물리주소에 접근하지 않는다. 논리주소로 어떤 연산을 하든 나중에 실행시간 바인딩때 물리주소가 결정됨
+
+Routine은 디스크에 relocatable한 format으로 저장되어 있으면 됨 항상 메모리에 있어야할 필요 없음
+Static linking : loader가 system library와 program code를 binary image로 결합
+Dynamic linking : execution time까지 linkning이 연기됨
+(프로세스간 라이브러리 공유 가능케 함, DLL대상이 되는 파일의 버전이 달라서 실행할 수 없는 등의 단점이 있음)
+
+Relocation register는 유저 프로세스들 간 보호를 하고 os code와 data를 바꾸는걸 보호한다.
+(Hardware support for relocation and limit register 그림 보기)
+
+Variable Partition(가변 파티션) : 운영체제는 사용가능한 메모리 부분과 사용중인 메모리 부분을 나타내는 테이블을 유지함
+hole : 사용 가능한 메모리 블록
+
+First fit : 충분한 크기의 첫 hole에 넣음
+Best fit : 충분한 크기의 smallest hole에 넣음(모든 리스트 조회해야함)
+worst fit : largest hole에 놓음(모든 리스트 조회해야함)
+
+External Fragmentation : total memory space(합치면 충분한 공간이 되지만 너무 작은 조각들로 분산되어있을떄 발생)
+Internal Fragmentation : 일반적으로 메모리를 작은 공간들로 분할 후 프로세스가 요청하면 분할된 크기의 정수배로 해주는데
+                               할당된 공간 > 요구된 공간일때 크기 차이를 말함.
+외부단편화를 compaction(압축)으로 해결 : 가용 공간을 한쪽으로 몰아서 큰 블록 만듬
+->재배치가 동적일때만 가능하고 비용도 많이듦 -> paging 써라
+
+Paging : 프로세스의 물리 주소공간이 연속되지 않아도 되는 메모리 관리 기법
+(외부단편화와 압축의 필요성을 해결함, 내부단편화는 크기 일치하지 않을시 발생함)
+물리메모리 :  frame으로 나뉨, 논리메모리 : page로 나뉨(같은 사이즈여야함)
+
+page number : page table의 인덱스
+page offset : 참조되는 프레임 안에서의 위칮
+
+page number=2, offset=2, 물리메모리=32B 주어지면
+-------------------------------------------------------
+page offset = "n = 2"
+page number = m - n = 2  -> "m = 4"
+page size = 2^n = 4byte
+logical memory space = 2^m = 16byte
+Frame size = page size와 동일 = 4byte
+Frame count = 32B / page size = 8
+page table entry size = 3bit	
+페이지 테이블 엔트리는 페이지 테이블 내 하나의 칸을 뜻한다. 
+프레임개수가 8(2^3)이니까 이걸 표현하려면 3bit가 필요
+page table size = 3bit * 4 =  12bit
+
+PTBR; page table base register : points to the page table
+PTLR; page table length register : indicates size of the page table
+
+소형 하드웨어 캐시인 TLB를 이용해 두 번의 메모리 엑세스(테이블 항목 찾을시, 실제주소 생성시)를 빠르게함
+어떤 TLB는 각 entry에 ASIDs(AddressSpaceIdentifilers)를 저장함 - 정보 보호용 
+또 페이지 번호와 프레임번호를 TLB에 추가해 다음 참조시 빠르게 찾도록함
+
+Address Translation(p, d)
+만약 p가 associative register이면 frame number를 바로 얻음(TLB에서)
+아니라면 메모리의 page table에서 얻어야함
+(Paging Hardware with TLB 그림보기)
+
+메모리 보호를 위해 페이지테이블에 protection bit를 놓고 유무효를 판단
+
+shared code(reentrant code) : 프로세스간에 공유되는 읽기전용 코드
+-읽고 쓰기 가능한 페이지가 공유되면 ipc에 유용함
+각 프로세스에는 자신의 실행을 위해 데이터를 보유하기 위한 자체 레지스터 사본과 데이터 저장 영역이 있는데
+표준c는 물리메모리에 하나의 사본만 저장함. 페이지테이블이 동일한 물리적 사본으로 맵핑시킴(하나의 사본만 필요함)
+
+페이지테이블을 메모리에 연속적으로 할당하기엔 공간너무 차지하니
+테이블을 여러 개의 작은 조각으로 나누는 방법
+1. Hierarchical page tables (2-level paging) 
+- 페이지 테이블 자체가 다시 페이징됨
+- 주소변환이 바깥페이지 테이블에서 안쪽으로 들어옴(forward mapped page table)
+2. Hashed page tables
+- 해시테이블 각 항목은 연결리스트가짐
+- 각 원소는 1. 가상 페이지 번호, 2. 사상되는 페이지 프레임번호, 3. 리스트상 다음 원소 포인터 가짐
+3. Inverted page table
+- 각 프로세스가 페이지 테이블을 따로 갖고 물리페이지를 조사하게 하지말고
+- one entry for each real page of memory로 한다는 의도
+- OS는 단 하나의 페이지 테이블만 유지하면 됨
+- 테이블 엔트리에 페이지주소 외에도 그 페이지를 소유하는 프로세스 id를 표시
+(그림 9.8 페이징 하드웨어, 9.18 역페이징 테이블 그림보기)
+-메모리 공간 절약가능하나 주소변환 시간 오래 걸림
+
+swapping
+메모리 부족한데 프로세스 더 써야할떄 실행 중인 프로세스 중에
+덜 중요한걸 backing store (hard disk)로 그 프로세스의 모든 페이지를 잠깐 빼둔다. (실행은 되고 있음)
+그래서 컨텍스트 스위칭때 실행이 되버리면 메모리에 올라와있지 않으니, 디스크에서 메모리에 다 올려서 실행함.
+공간 확장의 효과를 줄 수 있음, 시간은 오래걸려 안씀
+roll out, roll in 기법 사용하며 디스크에서 ready queue에 담겨 준비됨
+
+
+<10장>
+ 
+virtual memory : 실제의 물리 메모리 개념과 사용자의 논리 메모리 개념을 분리한 것
+실행시 프로그램의 일부만 실제 메모리에 있으면 됨 -> 실제 물리주소보다 더 커질수 있게함
+여러 프로세스들이 주소 공간을 공유 가능하게 함
+더 많은 프로그램을 concurrent하게 돌릴 수 있음
+전체 코드가 동시에 실행될 필요는 없음 -> partially load함  -> 메모리로 load나 swap할때 적은 io가 발생 이점
+
+sparse 주소 공간 : hole(스택과 힙 사이 공간)을 포함하는 가상주소공간
+(stack이나 heap이 커질 공간 또는 동적 링크 라이브러리로 채울때 유용)
+
+가상 메모리는 한 프로세스가 다른 프로세스와 공유할 수 있는 영역을 만들 수 있도록
+하며 이 영역을 공유하는 프로세스들에는 각자 자신의 sparse 공간상에 있는것 처럼 보이지만
+실제 물리 메모리는 공유페이지로 모두 공유되고 있다.
+
+Demand Paging : 필요한 페이지만 load하는 기법(lazy swapper)
+io 적게씀, 매모리 적게씀, response 빠름
+일부페이지는 메모리, 일부는 보조저장장치에 있으며 전자를 valid, 후자를 invalid
+page 필요할때 invalid reference이면 abort
+valid인데 메모리에 없으면 보조저장장치에서 메모리로 가져옴
+
+swapping : 전체 프로세스를 뺌, 커널이 어떤 페이지가 swap out 되기 전에 사용될 것인지 추측함
+demand paging : 커널은 사용될 페이지만 메모리로 가져옴
+차이가 있다.
+
+사용될 페이지를 결정하는건 MMU 기능적으로 구현해야함
+During MMU address translation, if valid-invalid bit in page table entry is 'i'
+-> page fault.
+(페이지 폴트 처리과정 그림보기)
+
+pure demand paging : 하나도 메모리에 페이지 안 올라와 있는 상태에서 프로세스 실행
+-> 참조 지역성 때문에 이런일은 잘 안일어남
+
+요구페이징을 위한 hw support
+1. 유효 무효 비트를 가진 page table. 2. 보조저장장치 3. instruction restart
+
+C<-A+B 실행하다 C에서 page fault 발생하면
+페이지폴트 처리 루틴이 요청한 페이지 c를 디스크->메모리로 로드. 그 후 페이지테이블 업데이트, 실행 재개
+instruction restart는 페이지 폴트가 발생한 후 페이지가 메모리로 로드되면, 해당 페이지 폴트가 발생한 명령부터 다시 실행되는 메모리 관리 기법입니다.
+
+Free Frame List : 페이지 폴트를 대비한 가용 프레임 풀
+zero fill on demand 방식 : 프레임은 할당되기 전에 0으로 모두 채워져 이전 내용이 지워짐
+(프레임 내용을 지우지 않을 경우 보안상 취약하기 떄문)
+
+(요구페이징절차보기)
+
+페이지 폴트 처리 시간 주요 구성요소
+1. 인터럽트 처리 2. 페이지 읽기 3. 프로세스 재시작
+2번은 하드웨어 성능에 의존, 1과 3은 정교한 코딩으로 감소가능
+
+EAT(effective access time)
+p = 0 -> no page fault
+p = 1 -> evey reference is a fault	0<=p<=1
+EAT = (1-p) * memory access + p * (page fault overhead +swap page in/out)
+
+swap space I/O는 더 큰 chunk를 할당함으로 file system I/O보다 더 빠르다.
+나은 페이지 처리량 얻는 옵션 : 프로세스 시작시 전체 파일 이미지를 스왑공간에 복사
+
+copy on write : 부모와 자식 프로세스가 처음에는 메모리의 같은 페이지를 공유하다 어떤게 수정하면 그 페이지만 복사됨
+free pages are allocated from a pool of zero-fill-on-demand pages
+(pool should always have free frames for fast demand page execution 
+-그래야 page fault시 사용중인 프레임 해제 또는 추가적인 처리가 필요치 않음)
+
+total demand frames(WSS) > total number of available frames -> Thrashing
+
+
+

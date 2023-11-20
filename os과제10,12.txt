@@ -1,0 +1,43 @@
+10.5
+• 9E F - 0E F
+• 111 - 211
+• 700 - D00
+• 0F F - EFF
+
+size of virtual/physical address space = 2^12 = 4096bytes. Page size = 256bytes = 2^8
+therefore 12-8 = 4high-order bits of logical address represent page number and 
+8 low order bits represent page offset
+
+where 9 represents virtual page number(vpn) and EF represents offset,
+From the given table the page number for the vpn 9 is, 
+The physical address is  0EF
+
+where 1 represents virtual page number(vpn) and 11 represents offset,
+From the given table the page number for the vpn 1 is, 2
+The physical address is 211
+
+where 7 represents virtual page number(vpn) and 00 represents offset,
+Read page 7 to free page frame D
+답) D00?
+
+corresponds to page 0-> read page 0 to free page frame E
+-> physical address = EFF
+답) EFF?
+
+10.9
+
+
+
+10.13
+
+
+
+
+---
+12.1
+
+
+12.3
+
+
+12.5

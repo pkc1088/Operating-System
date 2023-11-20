@@ -1,0 +1,244 @@
+36pge os operations 실행순서
+load : disk에 저장되어있던 데이터를 -> memory에 올림
+disk를 가져오라는 것은 hw interrupt임
+
+multiprogamming 하기위해서는 모든 job이 memory에 있어야함
+(매번 disk 접근하는것은 비효율적이니)
+
+multitasking은 동시에 실행되는것처럼 보이도록 함(동시성인듯)
+->모든 프로그램의 합은 메모리으 용량보다 크니  
+모두 메모리에 올릴 순 없으니 프로세스 일부만 memory에 올리는개념(virtual memory) 
+
+os는 user mode와 kernel mode를 둬 시스템을 보호한다(user mode에서 과한 명령어 등으로 부터)
+mode bit에 따라 이 둘을 구분함
+system call을 이용하면 user mode에서도 kernel mode를 접근할 수 있음.(파일 지우기 등 가능)
+실행 끝나면 다시 user mode로 됨
+
+처음실행되면 disk->memory 가고
+cpu가 memory에 매번 접근하는것은 비효율적이므로 그 사이의 cache를 사용함
+(한 번 memory에 접근할떄 100개를 가져와서 1개를 쓰고 99개를 cache에 저장하는 형태임)
+cpu 2개라면 memory는 공유하고 cache만 두개로 나눠져서 저장되는듯
+한쪽 cpu에서 데이터 수정이 있으면 memory로 내려오는게 아니라 다른쪽도 바로 수정함(본인 cache 뿐 아니라
+다른쪽 cache에도 수정) => cache coherency 
+	
+50pge : SRAM아니라 DRAM인듯
+
+하이퍼바이저가 guest OS들을 돌림
+
+<2장>
+17pge 초록표시 모두 system call임
+21pge 시스템콜을 호출하면 커널 모드에서 커널 코드가 실행됨 (mode switching)
+22pge
+2. 문자열의 경우 메모리에 넣어두고 그 첫 자리를 register에 넣어서 사용함
+
+33pge
+**system program은 상위레벨(사용자 영역)에 있는 프로세스임 system call은 interface임
+system program은 os에 포함된 프로그램(작업관리자 등)
+
+따라서, Static Linked Library는 실행 파일이 컴파일된 시점에서 모든 라이브러리 코드가 포함되어 
+있어야 하며, Dynamic Linked Library는 실행 시점에 라이브러리를 로드하기 때문에 실행 파일의 
+크기가 작아지고 라이브러리를 수정할 때에도 재컴파일이 필요하지 않습니다. 메모리절약 가능
+
+모놀리식 구조(Monolithic structure)
+모든 기능이 하나의 실행 가능한 파일에 포함되어 있는 구조입니다.
+모놀리식 구조는 단순하고 구현 및 배포가 간단하지만 유지보수성이 떨어지며, 
+대규모 소프트웨어에서는 확장성이 떨어질 수 있습니다.
+
+MicroKernels : 커뮤니케이션은 메세지 패싱 방식을 이용해 유저 모듈 사이에서 발생함
+장점은 확장성, 이식성, 안정성 단점은 오버헤드(유저와 커널간 통신에서)
+
+LKM (Loadable Kernel Module)은 커널 모듈 중에 동적으로 로딩과 언로딩이 가능한 모듈을 말합니다.
+커널의 크기가 작아집니다. 유지보수가 용이합니다. 보안이 강화됩니다.
+LKM은 독립적으로 동작하므로 커널 모듈 간의 상호작용이 어렵습니다. 성능이 저하
+
+public class Main {				메모리 적재 x
+public static void main(String[] args) { 		스택
+int age = 32;				스택(지역변수)
+List<String> skills = new ArrayList<>();		스택(skills ; 지역변수), 힙(ArrayList ; 동적할당 객체)
+skills.add("java");				힙(ArrayList ; 객체)
+skills.add("js");
+skills.add("C++"):
+test(skills);				스택(test ; 함수)
+}
+public static void test(List<String> list){		스택
+String mySkill = list.get(0);			스택(mySkill ; 지역변수)
+list.add("python");				힙(ArrayList ; 객체)
+}	test 메서드가 끝나면서 해당 프레임이 스택 메모리에서 제거됩니다.
+}	 main 메서드가 끝나면서 해당 프레임이 스택 메모리에서 제거됩니다.
+
+
+https://m.blog.naver.com/heartflow89/220954420688
+
+전역두고 ++ 시키면 개별동작함
+<3장>
+38pge
+shared Memory IPC
+프로세스간 접근막으니 shared memeory설정해놔서 process A와 process B간의 소통을 함
+message passing
+process B가 kernel한테 데이터(메시지)를 넘기고(send) kernel의 제어흐름일떄 kernel이 process A에게 전달함
+process A가  kernele에게 receive할 데이터있는지 확인함 (이떄 send와 receive는 system call)
+
+library call : c에서 printf같은 표준 call (프로세스 안에서만 실행됨- 링커가 연결해줌)
+system call : p1 -> kernel -> p2 처럼 conext switch 발생 (=> 오버헤드 발생)
+
+41pge
+p1이 p2에 데이터 넘길때 p1이 producer, p2가 consumer. producer가 버퍼에 데이터를 쓰고 consumer는 버퍼에서 읽음
+unbounded에서 producer는 멈추지 않고 계속 씀. consumer는 읽을게 없으면 대기
+bounded에서 buffer꽉차면 producer가 멈춘다. consumer가 읽으면 그 자리에 다시 쓴다.
+
+buffer size 5일때 in이 4이면 producer 코드보면 (in+1)%BuFFER_SZIE가 out인지 따지니깐 5칸 모두
+못 쓰고 4칸만 쓰게 된다.
+counter를 쓰면 in과 out이 둘 다 같은 값을 보므로 모든 buffer를 쓸 수 있다.
+
+p와 q사이에 직접 통신하면 direct이고 그 사이 r 프로세스가 끼여서 둘 사이 중계하거나 하면 indirect
+하나의 mailbox에 여러 프로세스가 접근가능
+하나의 process는 여러개의 mailbox를 생성할 수 있음
+근데 보통 두 프로세스 사이에 하나의 mailbox만 생성함(누가 받을지 모호함에 대한 solution)
+
+blocking : 동기방식; blocking send는 receive가 대기하고 있을떄까지 기다림 blocking reveive 받을게 없으면 받을때 까지 receive는 대기
+	send와 receive의 타이밍을 맞추겠다는 것
+nonblocking; 비동기방식: send든 receive이든 보내든 받든 신경쓰지 않고 다음꺼 수행됨
+
+rendezvous 랑데부 통신; 무전기 등
+--3.7-- 부터는 넘어감
+
+<4장>
+6.
+process의 data 부분은 전역변수이기에 모두공유된다. 즉 ipc의 shared memory나 message passing보다 간편함
+그래서 프로세스 생성보다 경제적이다.
+
+11. 멀티프로세서 : 프로세서라는 칩자체가 여러개 들어있음
+멀티코어 : 프로세서 하나의 칩에 코어가 여러개 들어있음 
+이제 멀티프로세스는 잘 안나옴
+하나의 코어는 동시에 여러 스레드를 돌릴 수 있다
+
+-멀티코어프로그래밍 시험 안나오는듯-
+추가) 멀티태스킹이 멀티프로그래밍을 포함하는 개념이며 멀티프로그래밍은 cpu가 점유하는 걸 동시성으로 구현
+멀티코어여야지 병렬성이 구현되며 멀티스레딩 및 멀티프로세싱은 동시성만 존재함. 멀티스레딩에서 context switch가
+일어나며 이것 역시 동시성임
+
+22. 사용자스레드(우리가 대부분사용하는 스레드; 가상의 스레드라고 할 수 있음)
+실행 흐름만 두개로 가져가는거임(나눠서 쓰는 듯 concurrency하게). 커널이 보기에는 그냥 프로세스 하나임
+시스템콜을 쓴다는건 커널을 실행한다는 뜻이니깐 시스템콜시 프로세스내
+모든 스레드가 block되는거임
+ 
+커널스레드; tcb;thread control block
+커널스레드는 오버헤드가 크다. 사용자스레드는 내부에서만 컨텍스트 스위칭이 일어나므로
+오버헤드가 적음. 커널스레드의 경우 인터럽트 걸리면 지금까지 진행상황이 stack에 올라가고
+register나 pc값들을 다시 불러와야해서 오버헤드가 크다.
+
+디스크 IO는 커널스레드로 만들어야함. 디스크 IO는 시스템콜을 자주활용하니까(파일읽고 쓰기)
+시스템콜은 사용자->커널모드를 실행하는거니까 콜 할때마다 사용자->커널 전환되니까.
+
+26.
+more concurrency than many-to-one(?)(스레드간에도 스위칭 일어나나?)
+
+44. 미리 많이 만들어둬서 필요할때 씀. (풀링기법)
+
+
+61.
+시그널은 프로세스로 전달됨 그럼 시그널핸들러가 실행됨
+
+64.
+비동기 캔슬 : 호출되자마자 지정된 스레드 종료시킴 -> 공유자원에대한 문제가 생길 수 있음
+Deffered cancellation : 일종의 지연캔슬. 체크해서 종료해야하는지 봄
+
+67. static과 유사
+68. LWP; 사용자 스레드를 관리하고 커널 스레드에 1대1 맵핑된다
+	lwp는 일종의 가상스레드.
+	만약 유저4 커널1개 스레드인 다대일인데 유저스레드중 하나가 
+	disk io등의 시스템콜로 블락되면 나머지 3개는 사용하지못함(커널은 1개니깐)
+	이떄 lwp를 제공시켜서 나머지 3개가 lwp를 통해 커널에서 사용되게 할 수 있음
+최근에 1대1 스레드사용(윈도우, 리눅스)
+
+74. 리눅스는 task가 스레드다
+사용자 스레드는 커널 개입 없이 사용자 영역 스레드 라이브러리를 활용한다. 또
+스케줄링 우선순위가 지원되지 않지만 커널스레드는 커널이 관리하는 스레드이며
+그렇기에 커널이 직접 프로세서에 스케줄링을 한다는 점에서 차이가 있다.
+
+만약 어플리케이션이 많은 수의 스레드를 필요로 한다면 커널스레드보다 유저레벨 스레드
+를 생성하고 관리하는것이 더 효율적이다.
+디스크 I/O의 경우 시스템콜을 자주 활용함으로 사용자 모드에서 커널모드로의 
+전환이 잦다. 따라서 아예 커널스레드를 사용함으로서 커널에 직접 접근할 수 있도록
+설계하는것이 효과적이다.
+<5장>
+cpu-burst(?)에 있는 데이터는 cpu에 넘겨주는듯
+
+8.
+1,4는 iocode나 종료코드에 도달해서 cpu가 스스로 놓은거임 (non-preemptive; 비선점형)
+2,3은 강제로 스케쥴링이됨 (preemptive; 선점형)
+현대 os는 선점형 사용함
+선점형은 cpu가 강제로 스케쥴링됨으로 레이스컨디션에 빠질 수 있음
+Dispatcher : 큐에서 어떤 프로세스를 선택에서 cpu에 할당을 해줄지 선택해주는 모듈
+
+13.
+turnaroudn time : cpu사용된시간(burstTime) + ready queue에 머무른 시간
+waiting time : ready queue에 머무른 시간
+response time : 이벤트 발생시 cpu에 의해 처리돼서 결과로 나오는 시간
+	리스폰스타임이 길면 웨이팅 짧아도 응답시간이 느릴수 있음(버튼 클릭등)
+	리스폰스타임은 짧은데 웨이팅 길면 클릭은 빨리 되는데 처리되는게 오래걸림
+cpu util, throughput 은 최대, 나머지는 최소일 수록 좋음
+
+sjf : next cpu burst가 짧은 순서대로 우선 스케쥴링함
+
+21.
+p1떄는 cpu가 아무도 안쓰니까 p1이 먼저되고, p2와 p3는 p1끝날때 ready queeu에 도착해
+있으니 p3 bursting time이 짧으니까 먼저쓰고 p4도 p2보다 짧으니 먼저.
+비선점형이니 p1이 끝나기전엔 p2,p3가 먼저와도 p1끝날때까지 기다림
+(0 + 14 + 2 + 6) /4 =5.5가 waiting time임. 자료에 오타임
+(0 + 4 + 10 + 14) /4 = 7 가 fcfs의 average waiting time
+
+25.
+srtf : sjf의 선점형 방식
+p1돌리때 p2가 도착했을때 p1남은 버스팅타이밍이랑 p2의 것고 비교해서 p2가 짧다면 p2가
+되도록 선점시키는 방식 ???
+
+Round Robin : 너무 짧게 q를 자르면 컨텍스트 스위치가 더 크게 걸림
+
+27. 1,2,3,누구 먼저쓰는지는 크게 중요하지 않음 이 예시에서
+sjf는 turnaround, waiting 타임이 가장 짧긴함.
+rr은 next cpu bursting time이 중요하진 않음. 그리고 response time이 짧음
+
+27. 17/3이 average waiting time 인듯?
+
+30. next cpu burst 타임이 가장 짧은애가 우선순위가 높음.
+    ready queue에 머문시간 오래된 얘한테 우선순위 높여줘서 starvation 막음
+
+31, 32p 그림이상(수정된듯)
+
+39.
+커널레벨 스레드들이 sjf, rr 등의 알고리즘으로 스케쥴링되는것이고 
+many to one, many to many의 경우 사용자레벨 스레드들은 thread library가 스케쥴한다.
+(LWP를 통해서)
+
+5-5는 대충봄
+
+57. DIspatch Latency = conflict phase + dispatch phase
+
+58.
+실시간 스케쥴링에서는 burst time뿐만아니라 deadline(d)도 고려함
+t = d = p이면 자기 혼자만 실행됨 다른 프로세스들이 개입할 여지가 없으니?
+
+59.
+우선순위는 주기의 역수. 주기가 짧다(자주 돌아온다)그러면 우선순위가 높다
+
+예시에서 cpu bursting time은 동일하다고 가정
+50초마다 발생하는데 20초동안 차지 => 40%프로 밑에는 35프로
+첫 그래프에서 p2를 먼저실행하니 p1의 데드라인을 못맞췄음(실패)
+
+61.
+아까는 주기 낮은애한테 우선순위 높게줘서 선점하게하는방식이였는데(rate-monor)
+EDF는 데드라인이 얼마 남지 않은애가 우선순위가 높아짐
+
+62.넘어감
+
+66. 기본적으로 rr 방식. 가장 우선순위 높은 클래스에서 가장 우선순위 높은 테스크 뽑는다.
+67.
+--끝--
+현대os는 멀티큐기반 라운드로빈 방식을 쓴다.
+
+
+**스택 힙 모두 fork하면 자식 부모가 따로 갖는다
+**멀티스레드는 코드, 데이터, 힙 영역 공유하고 스택은 따로 갖는다
+
+

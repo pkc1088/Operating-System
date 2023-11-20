@@ -1,0 +1,23 @@
+7.4
+Describe how deadlock is possible with the dining-philosophers problem.
+모든 철학자가 자신의 오른쪽 젓가락을 집은 상태에서 왼쪽 젓가락을 기다리는
+경우 데드락이 발생할 수 있다. 한 쪽 젓가락을 집은 상태에서 식사를 하기 위해서는
+옆의 다른 철학자가 젓가락을 내려놓아야만 한다. 서로 위와 같은 상황에서
+대기함으로 어느 누구도 식사를 할 수 없다. 
+
+7.11(fairness와 throughput을 정의한 후 tradeoff를 설명
+      그리고 starvation이 없는 방법을 제안)
+Discuss the tradeoff between fairness and throughput of operations
+in the readers–writers problem. Propose a method for solving the
+readers–writers problem without causing starvation
+
+fairness는 모든 프로세스가 공평하게 자원을 할당 받을 수 있도록 보장하는 것을
+말하며 throughput은 처리량으로서 단위 시간당 시스템이 처리하는 작업의 양을
+말한다. reader writer problem은 여러 reader와 writer가 동시에 데이터에 접근할때
+발생하는 문제이다. 이때 발생하는 tradeoff는 fairness를 충족시키기 위해서는 reader
+와 writer가 동일한 대기시간을 가져야 하지만 이는 throughput관점에서 시스템의
+성능이 저하될 수 있다. 즉 한쪽을 높이면 다른 쪽이 낮아지며 fairness와 throughput을
+적절히 조정해야한다. reader writer 문제를 기아 상태에 빠지게 하지 않고 해결
+할 수 있는 방법은  reader와 writer 큐를 만들고 균등한 기회를 부여하되 먼저 
+들어온 작업에 높은 우선순위를 주어서 오래 대기한 작업이 우선 해결되게 하여
+기아 상태에 빠지지 않도록 하면서 적절한 tradeoff를 만들 수 있다.

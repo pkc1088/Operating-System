@@ -1,0 +1,399 @@
+<6장>
+9. 한 번에 하나의 프로세스가 공유 자원에 접근할 수 있게 해야함
+13. progress : entry section에 있는 프로세스들만 선택받을 수 있다는 것 
+
+17. while(lock) ; 과 lock = true; 사이에 인터럽트가 걸리면 두 프로세스가
+모두 fasle인 줄알고 true 걸어놓고 둘다 critical section에 들어갈 수 있음
+
+19. 예시는 그걸 해결한듯
+turn이란 i와 j를 동시에 가질 수 없기에 atomic. -> mutual exclusion은 만족 
+remainder section에 있는 애가 key를 쥐고 있어서 progress를 만족시키지 못함
+진입하는 횟수에 제한 있음. Bounded waiting은 만족하는듯?
+
+25. 아키텍쳐 별로 성능향상을 위해 코드의 순서를 바꿔버릴수가 있음
+그러면 peterson 알고리즘은 보장되지 못함 그게 26, 27pge에 나타남
+소프트웨어적으로만 해결하려니 불가능하니 memory barrier을 이용한다.
+
+33. memory_barrier()을 이용해 reordering을 cpu 레벨에서 막아줌 또 x=100이라는걸 알리는듯
+근데 memory_barrier는 성능을 많이 저하시킬수 있다 하이레벨에서 쓰면
+
+---
+
+58. 커널x, 언어레벨(상위)에서 제공함
+공유변수는 procedure로만 접근가능하고 하나의 procedure만 접근가능함
+
+59. 모니터 내부는 세마포어로 구현하는듯
+나올때는 signal주고 나옴
+
+60. 특정 조건이 만족될때까지 대기해야한다면? -> 조건 변수를 사용
+조건변수에 wait와 signal을 줌
+
+62.
+signal and wait 시그널을 한 애가 기다리는것
+signal and continue 시그널을 한 p가 모니터에서 나갈때 까지 대기하다가 그 다음 q가 들어오는것
+
+63.
+wait(mutex)는 외부의 프로세스 출입을 관리
+공유변수에 누가 대기하고 있으면(if next_count > 0) -> signal(next) : 내부에 있는 애 불러드림
+signal(mutex) : 내부 대기하는 프로세스가 없으니 모니터 외부에 대기하고 있는 프로세스를 불러들이는것
+
+66, 67 넘어감
+
+70. liveness를 판단하는 대표적인 예시 deadlock
+
+--과제--
+32.
+두 파일 열어서 참고해라 ㅇ
+33.
+헤더파일에 getppid()를 추가해라		  ㅇ
+35. 처럼 getppid()에 대한 번호를 추가해줘라       ㅇ
+36. getppid에 대한 배열을 추가해라		  ㅇ
+37. 처럼 sysproc.c에 sys_getppid()를 구현해라     ㅇㄴ
+39. makefile에 hw1추가해서 수정해라
+--
+
+<7장>
+7pge.
+최초 empty가 n이면 비어있는게 n개이다는 뜻.
+5라면 4로 줄여진다.
+wait(mutex)로 mutex를 얻어서 들어간다 mutex는 1이다
+버퍼 쓰고나서 뮤텍스 해제할때 signal(mutex)한 후
+full에 signal을 준다. (full은 최초에 0으로 초기화 -> 1로 만들어줌)
+
+3이라치면
+empty = 3, mutex = 1, full = 0
+producer가 처음 들어가면
+2 0 0 하고 나올떄 2 1 1이 됨
+
+9.
+reader가 여러명이면 노상관
+writer는 한번에 하나만 들어가야함
+
+12.
+처음에 그냥 mutex얻음
+이 mutex는 다른 프로세스가 접근할떄 들어오는것 막음
+reader가 있을땐 writer가 접근못한다.
+
+43.
+Lock lock으로 수정
+
+47.
+language레벨에서 atomic을 이용해 원자성을 보장할 수 있음
+
+48,49 넘어감
+
+<8장>
+14. p : process = t : thread
+T1은 R2의 인스턴스 하나를 쥐고 R1의 인스턴스를 요청하는 상황
+
+15.
+사이클이 있으면 circular wait가 있을 수도 있음
+14pge예시는 사이클 없는듯, 15pge는 있음
+
+16. 사이클이 있지만 deadlock은 없는 경우
+R별로 인스턴스를 하나씩만 가지고 있으면 circular wait라고 봐도 되는데
+R이 2개 씩 들고 있으면 16pge처럼 deadlock 안 생길 수 도 있음.
+
+26.
+max > current + available : deadlock 발생
+available을 p_j쪽에 주고 p_j 끝나서 반환하는걸 합쳐서 p_i에 쓰면
+safe state seqeunce는 <p_j, p_i>가 된다
+
+27. 
+free reousrce가 3개이니까 T1에 2개 주면 T1끝나고 반환하면 5개가 반환받고
+T0에 주면 10개 반환받고 그러면 T2에도 줄 수 있으니 sequence는
+<T1, T0, T2>이다. 만약 처음부터 T0가 요청한다면 sequence에 반하는거니까
+판단해봐야할 문제임(문제가 생김(?))
+마지막 질문 : T2가 current needs 하나 더 가져가면 안됨.
+
+30.
+single instance : 사이클 존재 -> 데드락 발생
+multiple instace : 뱅커 알고리즘으로 판단
+
+32.
+T1은 R1을 할당받았고 R2를 요청 할 수 도 있다.
+T2는 R1을 요청했고 R2를 요청할 수 도 있다.
+-> 아직은 서큘러 안생기니 데드락 x
+
+33.
+만약 R2가 T2에 할당을 하면 싸이클이 발생 -> unsafe state
+(데드락까진 아닌데 만약 T1이 R2에 요청하면 데드락 확정)
+
+38.
+T1(122)가 available 332보다 작음. 그럼 process i가 작업 완료할 수 있음.
+그럼 p1이 작업완료해서 allocation 000이 되고 available + 200은 532(work)가 될 것.
+그 다음은 T3, T4, T0, T2임. safe state는 여러개일 수 도 있다.
+
+40.
+330 : 431보다 작음(만족) -> 근데 available보다 크니까 안됨
+020 도 안됨. 210으로 만족할수있는 need가 없음
+
+43. 주기적으로 체크 : 사이클이 있으면 데드락이 있구나를 암
+44. 리소스 제끼고 바로 연결시킴
+이 예시는 리소스별 인스턴스가 하나이니 데드락인듯
+
+48.
+p0, p2는 바로 들어가서 반환가능 -> avail은 313됨
+->513->724->726 (데드락 발생x)
+
+만약 available로 request를 충족시켜주지 못하면 그 프로세스들은 데드락걸림
+
+49. 전부다 데드락.
+
+<9장>
+6. base와 limit 레지스터를 이용해서 프로세스가 자신이 속한 주소에만 접근할 수 있도록 함
+
+11. compile time 작동방식의 경우 logical == physical, 
+    load time은 load할때 로직과 피지컬이 같아짐.
+    Execution time의 경우 다름.
+
+15.
+DLL은 DLL대상이 되는 파일의 버전이 달라서 실행할 수 없는 등의 단점이 있음
+
+18.
+mmu에서 limit 레지스터는 logical address를 검사하는 레지스터로 변신
+
+20.
+Hole : 프로세스가 빠져나가서 가용한 메모리 공간
+
+22. 
+external frag : 전체 메모리 빈 공간을 다 합친것
+
+25.
+물리메모리를 일정 단위로 자르고, 프로세스가 요구하는 공간도 자르고
+프로세스 요구를 물리메로리에서 제공할때 연속적으로 제공할 필요는 없음
+
+29.
+logical memory 크기 16byte임.
+한개의 페이지 4byte이니 4개의 페이지 존재.
+문제) 
+page size = 4byte(2^2)
+logical memeory space = 16byte(?) 
+Freamse size = 4
+count  = 8
+page table entry size = 3bit
+page table size = 3bit * 4 =  12bit
+
+30.
+실제로 36pages 필요하다.
+맨 마지막 페이지에 2048할당되지만 1086쓰니까 962 남음.
+프로세스에게 할당되었지만 내부적으로 사용할 수 없는 internal frag
+페이지 커지면 페이지 테이블 커진다.
+
+31. 넘어감
+
+32.
+페이지 크기는 16바이트
+페이지테이블은 메모리에 있음
+TLB는 프로세스별로 유지되는 cache임.
+
+*Hardware support for relocation and limit register 그림 보기.
+
+50. 물리프레임 주소에 맵핑된걸 찾음
+페이지테이블에서 pid와 page로 찾는다. (특정 프로세스가 가지는 몇번 page를 찾겠다는 뜻)
+몇번째 인덱스에 있는지 찾음(물리 프레임 주소를 얻게됨)
+
+53. swapping 은 최근에 사용 x. 메모리 부족한데 프로세스 더 써야할떄 실행 중인 프로세스 중에
+덜 중요한걸 backing store (hard disk)로 그 프로세스의 모든 페이지를 잠깐 빼둔다. (실행은 되고 있음)
+그래서 컨텍스트 스위칭때 실행이 되버리면 메모리에 올라와있지 않으니, 디스크에서 메모리에 다 올려서
+실행함.
+공간 확장의 효과를 줄 수 있음, 시간은 오래걸림
+
+59pge 부터 넘어감.
+
+--과제2--
+3.
+yield는 ready상태로 만듬(runnable)
+sched는 컨텍스트 스위치하게 만듬
+
+4.
+enum procstae 참고해라
+
+5.
+context switching할때 정보를 안전하게 저장 교환할때 spin lock 구조체 활용함
+오른쪽 사진에 파란색 그림이 lock, release로 프로세스 테이블에 다른 프로세스가 접근하는걸 보호
+그후 64개의 프로세스를 탐색함, 밑부분은 선택된 프로세스가 cpu에 할당되고 running상태로되고
+컨텍스트 스위치발생. 
+
+8, 9.
+time 인터럽트 걸리면 run -> runnable, 
+sched실행
+현재 프로세스에서 스케쥴러로 스위칭이 일어남
+process 2 실행됨
+
+10.
+라운드로빈 대신 13pge 우선순위 스케줄링 알고리즘을 구현해라
+
+13.
+7pge trap.c내에 yield 호출하는 부분을 수정해서 강제로 할당해제 되지 않도록 변경해라
+
+제출시 캡쳐할건 없음
+-----------
+
+
+<10장>
+
+5. 전체코드(코드영역)가 동시에 실행될 필요는 없음 -> 부분적으로 load함 
+swapping보다 swap io가 적다.
+
+6. segmentation 기술은 요즘에 사용안한다.
+
+9.
+가상 메모리 기술로 메모리 사이즈가 16기가라도 30기가 짜리 
+프로세스를 스와핑을 통해 사용할 수 있다.
+
+정적라이브러리나 동적라이브러리를 메모리 빈 공간에 맵핑시켜서 필요할때
+접근할 수 있게 한느 듯.
+
+마지막 문단은 IPC에 대한 내용.
+
+12. swapping은 전체 프로세스를 빼내야하니까 많은 스와핑이 필요하나
+demand paging(=virtual memory)은 적은 양만 스와핑해주면 됨.
+
+13. pager = kernel
+
+copy on write 는 그냥 참고
+
+30.
+최대한 많은 프로세스를 올리려다보니 -> memory over allocation 발생
+빈공간 없으면 -> page replacement를 함(뺼 떄 page fault를 최소화 해야함)
+
+31.
+뺄 페이지 선택하고 페이지를 수정할때 디스크에 써야함.(modify bit 사용)
+
+32. 
+B를 pm에 올리려고하는데 빈공간 없음 -> page fault발생
+그래서 page replacement 해야함.
+
+33.
+빈공간 없으면 교체될 페이지 (= victim frame) 선텍헤애힘.
+민약 victim frame이 교체 중에 수정되어야한다면 그걸 disk에 써야함
+
+36.
+메모리 클수록 페이지 폴트률 줄어듬
+
+37. FIFO로 가장 먼저 들어온애 뺀다.
+     15 page faults out of 20 
+     frame이 늘어난다고 page fault가 항상 줄어드는건 아님
+
+39.
+가장 오랫동안 access되지 않을 페이지인 7을 먼저 뺌.
+
+40.
+access 된지 가장 오래된 페이지를 교체. (오랫동안 사용되지 않은)
+
+41.
+1. 어떤 페이지 접근할때마다 counter 메번 늘려주는 방식
+페이지 폴트 생길때마다 모든 페이지 비교해서 선택해야하는 오버헤드있음
+
+2. 접근된 페이지를 탑으로 올림.
+모든 인스트럭션에 대해 항상 실행해야함으로 이것도 느림.
+대신 선택할때는 스택 맨 밑에 있는 애 교체하면 되긴함
+
+42. 위넘어감
+
+43. 
+Reference bit
+reference가 된지 체크하는 bit를 둠 (이 방식은 구현이 현실적임)
+최근에 reference되지 않은 애를 교체하겠다는 건데 (그들간 순서를 알 순 없음)
+Additional Refernce bit
+bit를 몇 개 둔다. 타이머 이용 -> 어떤 페이지가 언제 acccess된지 알 수 있음
+
+44.
+1이면 0으로 바꾸고 넘어감.
+leave page in memory : 일단 한 번은 메모리에 남겨둔다.
+
+45. 자주 사용되면 살아남음. 안쓰면 디스크로 감(교체됨)
+46. (0, 1)은 최근에 참조되지 않았는데 교체하기엔 오버헤드가 크다는 듯
+47, 48, 49. 넘어감
+
+51. 프로세스 별 할당해주는 기준.
+
+53. global : 다른 프로세스 껄 뻇어서 줌
+    local : 할당된 프레임내에서 선택됨 (메모리를 풀로 다 쓸 수 없긴함)
+
+55. a에서 페이지 회수, b에서 할당, c에서 다시 회수하는 식으로 조절을 함
+56. 페이지 폴트 처리한다고 프로세스가 제대로 실행되지 못하는 상황
+     (cpu 활용률이 떨어지는 것)
+
+61.
+너무 작게 잡으면 로컬리티 파악하기 힘듦
+필요한 최소 페이지수가 t1떄는 5개 t2때는 두개임
+
+63. 오버헤드가 큼
+65. 처음에 폴트율 올라오고 그 후는 낮아짐
+
+67~73. 넘어감
+77. 페이지 커지면 폴트율은 줄지만 효율 떨어짐
+이후 넘어감
+
+--과제3--
+growproc : 프로세스 크기 늘림
+allocuvm, deallocuvm : user의 vm을 늘리고 줄임
+과제에서는 allocuvm을 사용함
+
+growproc은 호출하지 안되 사이즈 늘려야됨.
+swtich문으로 trap.c에서 에러메세지 출력.
+
+lazy alloc : 페이지폴트가 트랩하고나면 페이지에 필요한 메모리를 새로 할당해서
+페이지 폴트를 무효화함.
+
+13.
+a : virtual memory, v2p : virtual to physical memory
+이런 파라미터 바꾸지 않고 구현함
+-----------------
+
+<12장>
+
+10.
+cpu의 명령어 실행결과 시스템 버스를 통해 나가 data-out register 등에 씀
+그 후 IO controller가 써진걸 인식하고 수행함. 다 읽고 나서 하드웨어 인터럽트 걸어놓으면.
+cpu가 그걸 인지함
+
+11.
+cpu가 controller와 통신하는 방식
+1. memory mapped i/o
+메모리 주소공간 일부를 io 공간으로 씀 
+(insturction 방식을 통일해서 갯수를 줄일수 있음, 메모리공간크게먹음)
+설계 간단, 메모리 공간 많이 먹음
+2. io mapped io
+io를 위한 별도의 주소공간을 둠
+(공간 낭비없고, io operation이 memory 관리에 영향 안줌)
+설계 복잡, 메모리 공간 낭비 x
+
+13.
+읽는 방식
+1. Polling : 특정컨트롤러에 값 쓰고 싶을때 커널이 비어있는지 상태를 체크함
+busy waiting 방식은 비효율적이니 intterupt 방식씀
+2. Interrupt : interrupt 여부를 체크함.
+
+17, 18pge 넘어감
+
+19. DMA : 메모리와 disk controller 간의 직접통신을 말함.
+cpu는 dma controller에게 명령하면 dma는 disk controller의 일부분을 메모리에 올림
+
+이후 다 넘어감
+
+44, 45 그림보기
+system call -> io subsystem에서 cache 있는지 본다.
+없으면 device io queue에 들어가 blocked됨
+
+다 읽으면 controller가 interrupt검. cpu가 그 인터럽트 체크하면 interupt service routine 실행
+그 후 디바이스 드라이버한테 얘기함. 그럼 그 드라이버가 관련 내용 처리함
+ready queue로 이동시키고 이 프로세스가 cpu에 할당되면 io요청이 완료됨을 알 수 있음
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

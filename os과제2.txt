@@ -1,0 +1,75 @@
+2.1 What is the purpose of system calls?
+
+
+2.3 What system calls have to be executed by a command interpreter or shell
+in order to start a new process on a UNIX system?
+
+fork(): This system call is used to create a new process by duplicating the current process. 
+The new process is called the child process, and the original process is called the parent process.
+현재 프로세스를 복재해서 새로운 프로세스를 생성하며 이를 자식 프로세스, 
+기존의 프로세스를 부모프로세스라고 한다.
+
+execve(): This system call is used to replace the current process image with a new process image. 
+The new process image can be specified as a file path and a list of arguments.
+
+wait(): This system call is used by the parent process to wait for the child process to terminate. 
+This allows the parent process to synchronize its execution with the child process and to retrieve 
+information about the child process's exit status.
+자식 프로세스가 종료되길 기다리도록 하는 부모 프로세스에서 사용되는 시스템 콜이다. 자식프로세스가
+종료될 떄까지 기다려 동기화되도록 하여 orphan이나 demon이 발생하는 것을 막는다.
+
+
+3.1  Using the program shown in Figure 3.30, explain what the output will
+be at LINE A.
+
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+int value = 5;
+int main()
+{
+pid t pid;
+pid = fork();
+if (pid == 0) { /* child process */
+value += 15;
+return 0;
+}
+else if (pid > 0) { /* parent process */
+wait(NULL);
+printf("PARENT: value = %d",value); /* LINE A */
+return 0;
+}
+}
+
+자식 프로세스가 종료될 때까지 부모 프로세스는 wait하고 있으므로 자식 프로세스(pid가 0일떄)
+value는 15가 더해져 20이 된 후 종료되고 부모프로세스에서  value값인 20을 출력한다.
+
+3.2 Including the initial parent process, how many processes are created by
+the program shown in Figure 3.31
+
+#include <stdio.h>
+#include <unistd.h>
+int main()
+{
+/* fork a child process */
+fork();
+/* fork another child process */
+fork();
+/* and fork another */
+fork();
+return 0;
+}
+
+parent -> (parent, child1) -> ((parent, child2), (child1, child3)) -> 4개에서 각각 2개로
+분기되니 총 8개의 프로세스가 생성됨
+
+
+3.5 When a process creates a new process using the fork() operation, which
+of the following states is shared between the parent process and the child
+process?
+a. Stack
+b. Heap
+c. Shared memory segments
+
+3.8 Describe the actions taken by a kernel to context-switch between processes.
+

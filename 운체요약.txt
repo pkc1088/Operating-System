@@ -1,0 +1,91 @@
+BootStrap -> kernel load -> system daemon -> kernel interrupt driven
+
+sjf is priority scheduling where priority is the inverse of
+predicated next cpu burst time.
+
+priority scheduling 문제점 : starvation 해결책 : aging(대기시간길수록 우선순위 높여줌)
+
+priority w rr : 같은 우선순위는 rr돌림
+
+Real Time CPU scheduling
+interrupt latency : 인터럽트 도착 후 인터럽트 서비스 루틴 실행이 시작될 떄까지의 시간
+Dispactch latency : 스케쥴러가 현재 프로세스를 중지하고 다른 프로세스를 시작하는데 필요 시간
+	           : conflict phase(충돌방지 단계) + dispatch phase(새로운 task 실행되도록 cpu 할당)
+
+soft real time : 치명적 손상 x
+hard real time : 데드라인 존재, 어기면 치명적 손상
+
+Rate monotonic Scheduling
+우선순위는 주기의 역수. 주기가 짧다(자주 돌아온다)그러면 우선순위가 높다
+
+EDF
+실시간으로 데드라인이 얼마 남지 않은애가 우선순위가 높아짐
+요구사항 : 프로세스가 실행 가능 상태가 되면 스케쥴러에게 마감시간을 알려야함
+
+**스택 힙 데이터 코드 모두 fork하면 자식 부모가 따로 갖는다
+**멀티스레드는 코드, 데이터, 힙 영역 공유하고 스택은 따로 갖는다
+
+process 는 concurrent (child - parent)
+exec() : 프로세스의 메모리 영역을 새로운 프로그램으로 대체시킴
+
+context switch : cpu가 한 프로세스에서 다른 프로세스로 전환되는 것(by interrupt or syscall)
+interrupt : 하드웨어에서 발생, 프로세서가 실행 중인 프로그램의 실행을 일시 중단하고, 
+	 외부에서 발생한 이벤트나 예외 상황을 처리하기 위한 기능
+trap :소프트웨어가 의도적으로 발생시키는 내부의 예외상황을 말함(시스템콜)
+system call : 사용자 수준에서 커널 모드로 진입하기 위한 콜이다.  
+	     운영체제의 서비스를 호출할 때 사용됩니다.
+system program : os가 제공하는 사용자 프로그램
+
+SrcProgram -> 'compiler' -> ObjectFile -> 'linker' -> ExecutableFile -> 'loader' -> Program
+			otherOfile->                                            DLL ->
+
+wait호출없이 부모가 먼저 종료시 살아있는 자식은 orphan, 자식이 먼저 종료되면 자식은 zombie
+
+IPC
+1. shared memory : 프로세스들 사이에 공유메모리를 설정함
+	데이터복사 x -> 빠름 / 동기화 해줘야 race condition 발생 x
+2. message passing : 프로세스들이 mailbox 및 링크를 생성하고 커널을 통해 receive, send를 함
+	데이터 누락의 위험성 적음 / 처리 속도 느림
+
+MultiThread시 process의 data 부분은 전역변수이기에 모두공유된다(코드, 데이터, 힙 영역 공유). 
+즉 ipc의 shared memory나 message passing보다 간편함
+그래서 프로세스 생성보다 경제적이다.
+
+멀티태스킹이 멀티프로그래밍을 포함하는 개념이며 멀티프로그래밍은 cpu가 점유하는 걸 
+동시성으로 구현. 멀티코어여야지 병렬성이 구현되며 멀티스레딩 및 멀티프로세싱은 동시성만 
+존재함. 멀티스레딩에서 context switch가 일어나며 이것 역시 동시성임
+멀티태스킹은 여러 개의 작업(Task)을 동시에 처리하는 것을 의미하며, 멀티프로그래밍은 CPU가 작업을 빠르게 번갈아가며 실행하면서, 하나의 작업이 끝나기 전에 다른 작업을 수행하는 것을 의미합니다.
+
+멀티코어는 여러 개의 프로세서 코어를 가진 하나의 컴퓨터 시스템입니다. 이러한 시스템에서는 
+병렬성을 이용하여 여러 개의 작업을 멀티스레딩과 멀티프로세싱은 모두 동시성(concurrency)을 
+구현하는 방법입니다. 멀티스레딩은 하나의 프로세스 내에서 여러 개의 스레드를 생성하여, 
+스레드 간에 작업을 나누어 처리합니다. 멀티프로세싱은 여러 개의 프로세스를 생성하여, 
+각각의 프로세스가 독립적으로 작업을 처리합니다.
+Context switch는 CPU가 현재 실행 중인 프로세스나 스레드를 멈추고 다른 프로세스나 스레드를 
+실행하는 작업입니다. 따라서 멀티스레딩에서도 Context switch가 일어날 수 있으며, 
+이는 동시성(concurrency)을 구현하기 위한 방법 중 하나입니다.
+
+MultiCore Pro
+Data parallelism : 동일한 데이터를 여러 코어에 분산시켜 각 코어에서 동일한 작업 수행
+Task parallelism : 코어에 스레드를 분산시켜 각 스레드가 고유 작업 수행
+
+사용자 스레드 : 커널 개입 x, 오베헤드 적음, 스케줄링 우선순위 지원 x, 시스콜시 다른 모든 스레드 블락됨
+커널 스레드 : 커널 관리, 사용자-커널 전환 잦아 성능 저하, 스케줄링 우선순위 지원 ㅇ
+
+Many to one : 시스템은 커널 스레드를 인식하는데 커널은 1개이니 병렬실행 불가
+	      유저스레드 하나가 사용중이면 다른 것들은 블락됨
+One to one : 동시성 발생 비율이 높다
+	      오버헤드로 인해 생성에 제한 생길 수 있다
+
+멀티스레드에서 한 스레드가 fork호출하면 새로운 프로세스는 모든 스레드 복제하냐?
+fork이후 exec하면 exec에서 지정한 프로그램이 모든 메모리 영역 대체할 것이므로
+호출한 스레드만 복제, exec 안하면 모든 스레드를 복제
+
+비동기 캔슬 : 호출되자마자 지정된 스레드 종료시킴 -> 공유자원에대한 문제가 생길 수 있음
+Deffered cancellation : 일종의 지연캔슬. 체크해서 종료해야하는지 봄
+
+LWP; 사용자 스레드를 관리하고 커널 스레드에 1대1 맵핑된다
+	lwp는 일종의 가상스레드.
+	만약 유저4 커널1개 스레드인 다대일인데 유저스레드중 하나가 
+	disk io등의 시스템콜로 블락되면 나머지 3개는 사용하지못함(커널은 1개니깐)
+	이떄 lwp를 제공시켜서 나머지 3개가 lwp를 통해 커널에서 사용되게 할 수 있음
